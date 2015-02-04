@@ -1,0 +1,125 @@
+# This file contains SQL definitions of tables used by resource server
+
+# these tables contain contain information obtained obtained from authoriazation server
+# at time of registration.  
+am_details:
+    columns:
+      auth_server_id: BIGINT AUTO_INCREMENT PRIMARY KEY
+      # api details
+      issuer: VARCHAR(2048)
+      registration_endpoint: VARCHAR(2048)
+      authorization_endpoint: VARCHAR(2048)
+      token_endpoint: VARCHAR(2048)
+      resource_set_registration_endpoint: VARCHAR(2048)
+      resource_permissions_endpoint: VARCHAR(2048)
+      user_endpoint: VARCHAR(2048)      
+      version: VARCHAR(32)
+      # registration details
+      client_id: VARCHAR(2048)
+      client_secret: VARCHAR(2048)
+      client_secret_expires: TIMESTAMP NULL
+      client_id_issued: TIMESTAMP NULL
+      registration_access_token: VARCHAR(2048)
+      registration_client_uri: VARCHAR(2048)
+      client_name: VARCHAR(256)
+      token_endpoint_auth_method: VARCHAR(256)
+    
+client_grant_type:
+    depends:
+        - am_details
+    columns:
+      auth_server_id: BIGINT
+      grant_type: VARCHAR(2048)
+    constraints:
+      - FOREIGN KEY(auth_server_id) REFERENCES am_details(auth_server_id) ON UPDATE CASCADE ON DELETE CASCADE
+
+client_redirect_uri:
+    depends:
+        - am_details
+    columns:
+      auth_server_id: BIGINT 
+      redirect_uri: VARCHAR(2048)
+    constraints:
+      - FOREIGN KEY(auth_server_id) REFERENCES am_details(auth_server_id) ON UPDATE CASCADE ON DELETE CASCADE
+    
+client_response_type:
+    depends:
+        - am_details
+    columns:
+      auth_server_id: BIGINT
+      response_type: VARCHAR(2048)
+    constraints:
+      - FOREIGN KEY(auth_server_id) REFERENCES am_details(auth_server_id) ON UPDATE CASCADE ON DELETE CASCADE
+
+client_default_acr_value:
+    depends:
+        - am_details
+    columns:
+      auth_server_id: BIGINT
+      default_acr_value: VARCHAR(2048)
+    constraints:
+      - FOREIGN KEY(auth_server_id) REFERENCES am_details(auth_server_id) ON UPDATE CASCADE ON DELETE CASCADE
+
+client_scope:
+    depends:
+        - am_details
+    columns:
+      auth_server_id: BIGINT
+      scope: VARCHAR(2048)
+    constraints:
+      - FOREIGN KEY(auth_server_id) REFERENCES am_details(auth_server_id) ON UPDATE CASCADE ON DELETE CASCADE
+      
+# the table below contains user info
+
+user_details:
+    depends:
+        - am_details
+    columns:
+      id: BIGINT AUTO_INCREMENT PRIMARY KEY
+      user_id: VARCHAR(256)
+      access_token: VARCHAR(4096)
+      refresh_token: VARCHAR(4096)
+      auth_server_id: BIGINT NOT NULL
+    constraints:
+      - FOREIGN KEY(auth_server_id) REFERENCES am_details(auth_server_id) ON UPDATE CASCADE ON DELETE CASCADE
+      
+# resource_sets:
+    # depends:
+        # - am_details
+        # - user_details
+    # columns:
+      # resource_set_id: BIGINT AUTO_INCREMENT PRIMARY KEY
+      # owner_id: BIGINT
+      # parent_id: BIGINT
+      # resource_set_name: VARCHAR(256)
+      # resource_set_path: VARCHAR(2048)
+      # resource_set_description: VARCHAR(2048)
+      # resource_uri: VARCHAR(2048)
+      # protection_id: VARCHAR(256)
+      # protection_revision: VARCHAR(256)
+    # constraints:
+      # - FOREIGN KEY(parent_id) REFERENCES resource_sets(resource_set_id) ON DELETE CASCADE
+      # - FOREIGN KEY(owner_id) REFERENCES user_details(id) ON DELETE CASCADE
+
+resource_details:
+    depends:
+        # - resource_sets
+        # - am_details
+        - user_details
+        
+    columns:
+      resource_id: BIGINT AUTO_INCREMENT PRIMARY KEY
+      owner_id: BIGINT
+      parent_id: BIGINT
+      resource_name: VARCHAR(256)
+      resource_path: VARCHAR(2048) NOT NULL
+      resource_description: VARCHAR(2048)
+      resource_uri: VARCHAR(2048)
+      is_composite: CHAR(1)
+      protection_id: VARCHAR(256)
+      protection_revision: VARCHAR(256)
+    constraints:
+      - FOREIGN KEY(parent_id) REFERENCES resource_details(resource_id) ON DELETE CASCADE
+      - FOREIGN KEY(owner_id) REFERENCES user_details(id) ON DELETE CASCADE
+      - UNIQUE path_id (resource_path(200))
+    

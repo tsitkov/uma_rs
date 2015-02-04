@@ -1,0 +1,122 @@
+body {
+  padding-top: 50px;
+}
+
+.navbar-inverse {
+  /* background: #660000; */
+  background-color: #fff;
+}
+
+
+.navbar-fixed-top {
+    border-width:  0 0 2px;
+//    border-color: #660000;
+}
+
+.navbar-inverse .navbar-nav > .active > a {
+    color: #5d1509;
+//    background-color: #9d9d9d;
+    background-color: #fff;
+}
+
+.navbar-inverse .navbar-nav > .active > a:hover,
+.navbar-inverse .navbar-nav > .active > a:focus
+{
+    color: #5d1509;
+    background-color: #fff;
+}
+
+.navbar-inverse .navbar-nav > li > a {
+    color: #fcaf3e;
+}
+
+.navbar-inverse .navbar-nav > li > a:hover,
+.navbar-inverse .navbar-nav > li > a:focus {
+    color: #fcaf3e;
+    text-decoration: underline;
+}
+
+.navbar-inverse .navbar-brand {
+  color: #5d1509;
+}
+
+.navbar-inverse .navbar-brand:hover,
+.navbar-inverse .navbar-brand:focus {
+    color: #fcaf3e;
+}
+
+/*
+ul.nav.navbar-nav.navbar-right li a {
+  color: #660000;
+}
+
+ul.nav.navbar-nav.navbar-right li a:hoover {
+  color: blue;
+}
+*/
+
+.starter-template{
+  padding: 40px 15px;
+  text-align: center;
+}
+
+.resource-container {
+  padding: 10px 5px;
+}
+
+.action-bar {
+	padding: 10px 40px;
+	border-style: solid;
+	border-width: 0 0 2px;
+}
+
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+  background-color: lighten(#000, 93.5%);
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+}
+.form-signin .checkbox {
+  font-weight: normal;
+}
+.form-signin .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+.form-signin input[type="email"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.resource-icon {
+  height: 64px;
+  width: auto;
+}
+
+.table {
+  width: auto;
+}
+
+.table .checkbox label {
+  display: block;
+  text-align: right;
+  vertical-align: middle;
+}

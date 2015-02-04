@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:oauth2="http://www.springframework.org/schema/security/oauth2"
+	xsi:schemaLocation="http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<security:global-method-security pre-post-annotations="enabled" proxy-target-class="true" authentication-manager-ref="authenticationManager" />
+
+<!-- 
+	<bean id="webexpressionHandler" class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler" />  
+ -->
+ 
+	<!-- 
+	<oauth2:expression-handler id="oauthExpressionHandler" />
+	<oauth2:web-expression-handler id="oauthWebExpressionHandler" />
+ 	-->
+
+	<security:http
+		pattern="/resource/**" 
+		auto-config="false" 
+		use-expressions="true"
+		disable-url-rewriting="true" 
+		entry-point-ref="oauthAuthenticationEntryPoint" 
+		authentication-manager-ref="clientAuthenticationManager">
+		<!-- 
+		create-session="stateless" >
+		 -->
+		<security:custom-filter before="PRE_AUTH_FILTER" ref="clientAuthenticationFilter" />
+ 		<security:logout />
+	</security:http>
+	
+	<!-- 
+	<oauth2:resource-server id="resourceServerFilter" token-services-ref="defaultOAuth2TokenService" />
+ 	-->
+	
+	<security:http 
+		auto-config="false" 
+		use-expressions="true"
+		disable-url-rewriting="true" 
+		entry-point-ref="authenticationEntryPoint"
+		authentication-manager-ref="rsAuthenticationManager"
+		pattern="/**" >
+		<security:custom-filter before="PRE_AUTH_FILTER" ref="rsAuthenticationFilter" />
+		<security:logout />
+	</security:http>
+
+	<bean id="authenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+		<property name="loginFormUrl" value="/openid_connect_login" />
+	</bean>
+	
+	<!-- 
+	<bean id="oauthAuthenticationEntryPoint" class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+		<property name="realmName" value="openidconnect" />
+	</bean>
+	 -->
+	
+	<bean id="oauthAuthenticationEntryPoint" class="org.mit.uma.rcserver.security.RSAuthenticationEntryPoint">
+		<property name="realmName" value="openidconnect" />
+	</bean>
+
+	<security:authentication-manager id="rsAuthenticationManager">
+		<security:authentication-provider ref="rsAuthenticationProvider" />
+	</security:authentication-manager>
+
+	<security:authentication-manager id="clientAuthenticationManager">
+		<security:authentication-provider ref="clientAuthenticationProvider" />
+	</security:authentication-manager>
+
+	<bean id="rsAuthenticationProvider" class="org.mit.uma.rcserver.security.RSAuthenticationProvider">
+		<property name="authoritiesMapper">
+			<bean class="org.mit.uma.rcserver.security.NamedAdminAuthoritiesMapper">
+				<property name="admins" ref="namedAdmins" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="clientAuthenticationProvider" class="org.mit.uma.rcserver.security.ClientAuthenticationProvider" />
+
+	<util:set id="namedAdmins" value-type="org.mit.uma.rcserver.security.SubjectIssuerGrantedAuthority">
+		<!-- 
+			This is an example of how to set up a user as an administrator: they'll be given ROLE_ADMIN in addition to ROLE_USER.
+			Note that having an administrator role on the IdP doesn't grant administrator access on this client.
+			
+			These are values from the demo "openid-connect-server-webapp" project of MITREid Connect.
+		-->
+		<bean class="org.mit.uma.rcserver.security.SubjectIssuerGrantedAuthority">
+			<constructor-arg name="subject" value="90342.ASDFJWFA" />
+			<constructor-arg name="issuer" value="http://192.168.1.13:8080/uma-server/" />
+		</bean>
+	</util:set>
+
+	<!-- 
+	  - The authentication filters
+	 -->
+	<bean id="rsAuthenticationFilter" class="org.mit.uma.rcserver.security.AuthenticationFilter">
+		<property name="authenticationManager" ref="rsAuthenticationManager" />
+	</bean>
+	
+	<bean id="clientAuthenticationFilter" class="org.mit.uma.rcserver.security.ClientAuthenticationFilter">
+		<property name="authenticationManager" ref="clientAuthenticationManager" />
+	</bean>
+
+</beans>
